@@ -1,0 +1,21 @@
+<h1>Termékek</h1>
+
+<% for(let i = 0; i < products.length; i++) { %>
+    <div>
+        <h3><%=products[i].productName%></h3>
+        <h5><%=products[i].price Ft.%></h5>
+    </div>
+<% } %>
+
+<% products.forEach((p)=> { %>
+    <div>
+        <h3><%=p.productName%></h3>
+        <h5><%=p.price%> Ft.%></h5>
+    </div>
+<% }) %>
+
+<% for(let i = 1; i < 100; i++) { %>
+    <div>
+        <h3><%=i%></h3>
+    </div>
+<% } %>

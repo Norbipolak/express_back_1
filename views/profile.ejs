@@ -1,0 +1,16 @@
+<h1>This is the profile!</h1>
+<h2>Hello <%= user.userName%></h2>
+<p>
+    Your email address is: <%= user.email>
+</p>
+
+<% if(isAdmin) { %> 
+    <p>
+        Védett tartalom megjelenítése
+    </p>
+<% } else { %> 
+    <p>
+        Nem vagy jogosult a védett tartalom megjelenítésére
+    </p>
+>% } %>
+

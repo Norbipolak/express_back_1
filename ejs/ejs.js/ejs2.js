@@ -361,4 +361,113 @@ app.post("/login", (req, res)=> {
     res.render("profile", {user:req.body}); //!!!!!! 
 });
 
-/**/
+/*
+    Itt akkor csináltunk egy post-ot a login-ra, hogy meg tudjuk szerezni az adatokat, amiket beküldtünk a form.ejs-ből 
+    ezt a REQ-ből lesz, tehát amit a kliens küld a szervernek és ott is a body-ban 
+    1. login (oldal, mert abból várunk adatokat)
+    2. req-ből fogjuk megkapni az adatokat (req.body)
+    3. ott lesz egy olyan kulcs, hogy idAdmin (input, type radio, value 1)
+        req.body.isAdmin = req.body.isAdmin == 1 -> tehát ez azt jelenti, hogy admin-ok vagyunk 
+    4. res.render-vel pedig a szerver küld egy választ
+        res.render("profile", {user:req.body})
+    itt pedig a profile.ejs fogjuk majd render-elni, tehát az az .ejs fog megjelenni 
+    és átadnuk neki egy objektumot is a req.body-t, amit itt megszereztünk és abban azok az adatok lesznek (email, felhasználónév, isAdmin)
+    amit a user-ben megjelenítünk 
+    -> 
+    <h2>Hello <%= user.userName%></h2>
+    <p>
+        Your email address is: <%= user.email>
+    </p>
+
+    és a profile ha meg betölt, akkor így, fog kinézni 
+
+app.get("/profile", (req, res)=> {
+    res.render('profile', 
+        {
+            user: {name: "Olivér", email: "kovacs.oliver1989@gmail.com"},
+            isAdmin: true
+        });
+});
+
+és mivel a user-nek itt megadtuk azokat az adatokat, amiket a body-ból megkapunk (kitöltjük a form-ot és az alapján)
+ezért a localhost:3000/profile oldalon mindig azok jelennek meg (adatok), amiket a login-on (post) felvittünk!!!!!!!!!!!!!!
+
+Tehát itt fontos 
+    - kell lennie egy get-nek, hogy megcsináljuk a login oldalt, meg kell lennie egy form.ejs-nek, hogy render-elni tudjuk, amikor /login van 
+    - csinálunk egy login-ra egy post kérést (meg a form is egy post)
+        itt bekérjük a req.body-t 
+        render-vel megadunk neki egy másik oldalt, ahova átírányit, ha be vannak küldve az adatok (és az adatokat req.body)
+            meg is adjuk majd ennek az oldalnak a render-ben -> res.render("profile", {user:req.body})
+    - csinálunk egy olyan oldalt amire render-tünk 
+        nekünk ez már meg volt és itt megjelenírjük az adatokat, amiket kaptunk a req.body-ban!!!! 
+*/ 
+
+/*
+    de most a login-ban lett a render-tünk a profile-ra, de azt is meg lehet csinálni
+    -> 
+    ehelyett 
+
+app.post("/login", (req, res)=> {
+    console.log(req.body);
+    req.body.isAdmin = req.body.isAdmin == 1;
+    res.render("profile", {user:req.body}); //!!!!!! 
+});
+
+hogy -> 
+*/
+app.post("/profile", (req, res)=> {
+    console.log(req.body);
+    req.body.isAdmin = req.body.isAdmin == 1;
+    res.render("profile", {user:req.body});
+});
+/*
+    Viszont ilyen formában nagyon fontos, hogy ahol csináltuk a method="post"-ot a form.ejs-ben 
+    ott megadjuk, hogy az action="profile"
+    És akkor automatikusan, hogyha beküldjük a form-ot, akkor átírányit minket a profile-ra!!!!!!!!!!!!!!!!!!!!!!!
+    
+    <form method="post" action="/profile">
+    <h3>Email</h3>
+    <input name="email" type="text">
+
+    És ilyenkor a profile-ban szerezzük meg a body-t!!!!
+    Meg így életszerübb, hogy másik oldalra írányit át és nem ugyanarra!!!!  hanem itt profile-ra megyünk át app.post("/profile",
+    és nem maradunk a login-en, mint az elöbb -> app.post("/login", mert ott hiába a profile.ejs-t jelenítettük meg attól még a 
+    localhost:3000/login-en maradtunk ugyanazon az URL-en, ahol a form-ot kitöltötük, így meg átmentünk a localhost:3000/profile-ra 
+    de ehhez az is kell, hogy a form.ejs a method="post" mellett legyen még egy átírányítás is -> action="/profile" !!!!!!!! 
+*/
+
+/*
+    Összefoglalás 
+
+    A template engine-ek arra valóak, hogy HTML kódba tudjunk ágyazni különböző változókat (változóknak az értékeit)
+    Az egyik legnépszerübb az EJS 
+    Ezt úgy tudjuk használni, hogy 
+    1. npm i ejs 
+    2. app.set("view engine", "ejs");
+    3. Views mappa, ahol tároljuk az .ejs kiterjesztésű fájlokat, amik majd innen be lesznek olvasva
+    4. nem azt fogjuk meghívni a res objektumból, hogy send vagy json, hanem az, hogy RENDER!! 
+        ennek az első paramétere, hogy views mappában melyik ejs fájlt hsaználunk -> res.render("home")
+        második paraméterben meg át tudunk adni neki mindenféle adatokat -> res.render("home", {title: "Home Page"});
+        de ezek jöhetnek mondjuk adatbázisból is ezek az adatok 
+        -> 
+    Nagyon fontos, hogy így tudjuk majd összekötni az adatbázis adatait a HTML szerkezetünkkel!!! 
+    az adatokat pedig tudjuk render-elni változómegjelenítéssel (amitt itt csináltunk) -> {user: req.body} vagy ciklusokkal 
+    erre példa volt a products-os meg a profile-os 
+
+    Ha szeretnénk form adatokat beküldeni az method post és meghatározunk neki egy action-t, ami azt határozza meg, hogy hova 
+    írányitson át maga a rendszer 
+    és itt fontos, hogy az input mezőknek meghatározzunk name attributumokat!!!!! 
+    -> 
+    mert ezek lesznek majd a res.body-nak a kulcsai!!!!!! 
+    És csinálunk egy post endpoint-ot 
+    -> 
+app.post("/profile", (req, res)=> {
+    console.log(req.body);
+    req.body.isAdmin = req.body.isAdmin == 1;
+    res.render("profile", {user:req.body});
+});
+
+a req.body-nak az adatait fel tudjuk dolgozni úgy, ahogy mi szeretnénk és ezt felhasználjuk a render-eléshez!!!!
+-> 
+res.render("profile", {user:req.body});
+*/
